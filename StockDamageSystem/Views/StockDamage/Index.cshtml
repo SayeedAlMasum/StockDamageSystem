@@ -1,0 +1,258 @@
+﻿@{
+    ViewData["Title"] = "Stock Damage";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<div class="container mt-4">
+
+    <h3 class="mb-3">Stock Damage Entry</h3>
+
+    <!-- ================= FORM ================= -->
+
+    <div class="card p-3 shadow-sm">
+
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label>Warehouse Name</label>
+                <select id="ddlGodown" class="form-control"></select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Item Name</label>
+                <select id="ddlItem" class="form-control"></select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Item Code</label>
+                <input type="text" id="txtItemCode" class="form-control" readonly />
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label>Unit</label>
+                <input type="text" id="txtUnit" class="form-control" readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Stock</label>
+                <input type="text" id="txtStock" class="form-control" readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Batch No</label>
+                <input type="text" id="txtBatch" class="form-control" value="NA" readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Currency</label>
+                <select id="ddlCurrency" class="form-control"></select>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label>Exchange Rate</label>
+                <input type="text" id="txtExchange" class="form-control" readonly />
+            </div>
+
+            <div class="col-md-3">
+                <label>Quantity</label>
+                <input type="number" id="txtQty" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Rate</label>
+                <input type="number" id="txtRate" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Amount In</label>
+                <input type="number" id="txtAmount" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label>Dr A/C Head</label>
+                <input type="text" class="form-control" value="Stock Damage" readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label>Employee Name</label>
+                <select id="ddlEmployee" class="form-control"></select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Comments</label>
+                <input type="text" id="txtComments" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-primary" id="btnAdd">Add</button>
+            <button class="btn btn-success" id="btnSave">Save</button>
+        </div>
+    </div>
+
+    <!-- ================= TEMP TABLE ================= -->
+
+    <div class="card mt-4 p-3 shadow-sm">
+        <h5>Temporary Entry List</h5>
+
+        <table class="table table-bordered mt-2" id="tempTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Warehouse</th>
+                    <th>Item Code</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    var tempList = [];
+
+    $(document).ready(function () {
+        loadGodown();
+        loadItems();
+        loadCurrency();
+        loadEmployee();
+    });
+
+    // ================= LOAD DROPDOWNS =================
+
+    function loadGodown() {
+        $.get("/Api/GetGodown", function (data) {
+            var html = "<option value=''>--Select--</option>";
+            $.each(data, function (i, v) {
+                html += `<option value="${v.godownNo}">${v.godownName}</option>`;
+            });
+            $("#ddlGodown").html(html);
+        });
+    }
+
+    function loadItems() {
+        $.get("/Api/GetItems", function (data) {
+            var html = "<option value=''>--Select--</option>";
+            $.each(data, function (i, v) {
+                html += `<option value="${v.subItemCode}">${v.subItemName}</option>`;
+            });
+            $("#ddlItem").html(html);
+        });
+    }
+
+    function loadCurrency() {
+        $.get("/Api/GetCurrency", function (data) {
+            var html = "<option value=''>--Select--</option>";
+            $.each(data, function (i, v) {
+                html += `<option value="${v.currencyName}" data-rate="${v.conversionRate}">${v.currencyName}</option>`;
+            });
+            $("#ddlCurrency").html(html);
+        });
+    }
+
+    function loadEmployee() {
+        $.get("/Api/GetEmployee", function (data) {
+            var html = "<option value=''>--Select--</option>";
+            $.each(data, function (i, v) {
+                html += `<option value="${v.employeeName}">${v.employeeName}</option>`;
+            });
+            $("#ddlEmployee").html(html);
+        });
+    }
+
+    // ================= AUTO EXCHANGE RATE =================
+
+    $("#ddlCurrency").change(function () {
+        var rate = $("#ddlCurrency option:selected").data("rate");
+        $("#txtExchange").val(rate);
+    });
+
+    // ================= ADD BUTTON =================
+
+    $("#btnAdd").click(function () {
+
+        var obj = {
+            GodownNo: $("#ddlGodown").val(),
+            SubItemCode: $("#ddlItem").val(),
+            Quantity: $("#txtQty").val(),
+            Rate: $("#txtRate").val(),
+            AmountIn: $("#txtAmount").val(),
+            Currency: $("#ddlCurrency").val(),
+            ExchangeRate: $("#txtExchange").val(),
+            EmployeeName: $("#ddlEmployee").val(),
+            Comments: $("#txtComments").val()
+        };
+
+        tempList.push(obj);
+        loadTable();
+        clearForm();
+    });
+
+    // ================= LOAD TEMP TABLE =================
+
+    function loadTable() {
+        var rows = "";
+
+        $.each(tempList, function (i, v) {
+            rows += `<tr>
+                        <td>${v.GodownNo}</td>
+                        <td>${v.SubItemCode}</td>
+                        <td>${v.Quantity}</td>
+                        <td>${v.Rate}</td>
+                        <td>${v.AmountIn}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removeRow(${i})">Delete</button>
+                        </td>
+                     </tr>`;
+        });
+
+        $("#tempTable tbody").html(rows);
+    }
+
+    function removeRow(index) {
+        tempList.splice(index, 1);
+        loadTable();
+    }
+
+    // ================= SAVE BUTTON =================
+
+    $("#btnSave").click(function () {
+
+        if (tempList.length == 0) {
+            alert("No data to save!");
+            return;
+        }
+
+        $.ajax({
+            url: "/StockDamage/Save",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(tempList),
+            success: function () {
+                alert("Stock Damage Saved Successfully!");
+                tempList = [];
+                loadTable();
+            }
+        });
+    });
+
+    function clearForm() {
+        $("#txtQty").val("");
+        $("#txtRate").val("");
+        $("#txtAmount").val("");
+        $("#txtComments").val("");
+    }
+
+</script>
