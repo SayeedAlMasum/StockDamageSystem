@@ -1,121 +1,157 @@
 ﻿@{
-    ViewData["Title"] = "Stock Damage";
+    ViewData["Title"] = "Stock Damage Management";
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<div class="container mt-4">
+<div class="container mt-4 fade-in">
 
-    <h3 class="mb-3">Stock Damage Entry</h3>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Stock Damage Management</h1>
+        <p>Record and track damaged stock items with automated inventory updates</p>
+    </div>
 
-    <!-- ================= FORM ================= -->
-
-    <div class="card p-3 shadow-sm">
-
-        <div class="row mb-2">
-            <div class="col-md-4">
-                <label>Warehouse Name</label>
-                <select id="ddlGodown" class="form-control"></select>
-            </div>
-
-            <div class="col-md-4">
-                <label>Item Name</label>
-                <select id="ddlItem" class="form-control"></select>
-            </div>
-
-            <div class="col-md-4">
-                <label>Item Code</label>
-                <input type="text" id="txtItemCode" class="form-control" readonly />
-            </div>
+    <!-- ================= ENTRY FORM ================= -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit"></i> Damage Entry Form
         </div>
+        <div class="card-body">
 
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <label>Unit</label>
-                <input type="text" id="txtUnit" class="form-control" readonly />
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Warehouse Name</label>
+                    <select id="ddlGodown" class="form-select">
+                        <option value="">-- Select Warehouse --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label"> Item Name</label>
+                    <select id="ddlItem" class="form-select">
+                        <option value="">-- Select Item --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Item Code</label>
+                    <input type="text" id="txtItemCode" class="form-control" readonly placeholder="Auto-populated" />
+                </div>
             </div>
 
-            <div class="col-md-3">
-                <label>Stock</label>
-                <input type="text" id="txtStock" class="form-control" readonly />
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Unit</label>
+                    <input type="text" id="txtUnit" class="form-control" readonly placeholder="Auto-populated" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Available Stock</label>
+                    <input type="text" id="txtStock" class="form-control" readonly placeholder="Auto-populated" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Batch No</label>
+                    <input type="text" id="txtBatch" class="form-control" value="N/A" readonly />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label"> Currency</label>
+                    <select id="ddlCurrency" class="form-select">
+                        <option value="">-- Select Currency --</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="col-md-3">
-                <label>Batch No</label>
-                <input type="text" id="txtBatch" class="form-control" value="NA" readonly />
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label"> Exchange Rate</label>
+                    <input type="text" id="txtExchange" class="form-control" readonly placeholder="Auto-populated" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label"> Quantity</label>
+                    <input type="number" id="txtQty" class="form-control" placeholder="Enter quantity" step="0.01" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label"> Rate</label>
+                    <input type="number" id="txtRate" class="form-control" placeholder="Enter rate" step="0.01" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Amount</label>
+                    <input type="number" id="txtAmount" class="form-control" readonly placeholder="Auto-calculated" />
+                </div>
             </div>
 
-            <div class="col-md-3">
-                <label>Currency</label>
-                <select id="ddlCurrency" class="form-control"></select>
-            </div>
-        </div>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Dr A/C Head</label>
+                    <input type="text" class="form-control" value="Stock Damage" readonly />
+                </div>
 
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <label>Exchange Rate</label>
-                <input type="text" id="txtExchange" class="form-control" readonly />
-            </div>
+                <div class="col-md-4">
+                    <label class="form-label"> Employee Name</label>
+                    <select id="ddlEmployee" class="form-select">
+                        <option value="">-- Select Employee --</option>
+                    </select>
+                </div>
 
-            <div class="col-md-3">
-                <label>Quantity</label>
-                <input type="number" id="txtQty" class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <label>Rate</label>
-                <input type="number" id="txtRate" class="form-control" />
+                <div class="col-md-4">
+                    <label class="form-label"> Comments</label>
+                    <input type="text" id="txtComments" class="form-control" placeholder="Enter comments (optional)" />
+                </div>
             </div>
 
-            <div class="col-md-3">
-                <label>Amount In</label>
-                <input type="number" id="txtAmount" class="form-control" />
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary" id="btnAdd">
+                    <i class="fas fa-plus-circle"></i> Add to List
+                </button>
+                <button class="btn btn-success" id="btnSave">
+                    <i class="fas fa-save"></i> Save All
+                </button>
+                <button class="btn btn-info" id="btnClear">
+                    <i class="fas fa-redo"></i> Clear Form
+                </button>
             </div>
-        </div>
-
-        <div class="row mb-2">
-            <div class="col-md-4">
-                <label>Dr A/C Head</label>
-                <input type="text" class="form-control" value="Stock Damage" readonly />
-            </div>
-
-            <div class="col-md-4">
-                <label>Employee Name</label>
-                <select id="ddlEmployee" class="form-control"></select>
-            </div>
-
-            <div class="col-md-4">
-                <label>Comments</label>
-                <input type="text" id="txtComments" class="form-control" />
-            </div>
-        </div>
-
-        <div class="mt-3">
-            <button class="btn btn-primary" id="btnAdd">Add</button>
-            <button class="btn btn-success" id="btnSave">Save</button>
         </div>
     </div>
 
-    <!-- ================= TEMP TABLE ================= -->
-
-    <div class="card mt-4 p-3 shadow-sm">
-        <h5>Temporary Entry List</h5>
-
-        <table class="table table-bordered mt-2" id="tempTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>Warehouse</th>
-                    <th>Item Code</th>
-                    <th>Qty</th>
-                    <th>Rate</th>
-                    <th>Amount</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody></tbody>
-        </table>
+    <!-- ================= TEMPORARY ENTRY LIST ================= -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Pending Entries <span class="badge bg-light text-dark ms-2" id="entryCount">0</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="tempTable">
+                    <thead>
+                        <tr>
+                            <th> #</th>
+                            <th> Warehouse</th>
+                            <th> Item Code</th>
+                            <th> Quantity</th>
+                            <th> Rate</th>
+                            <th> Amount</th>
+                            <th> Employee</th>
+                            <th> Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="emptyRow">
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                No entries added yet. Fill the form above and click "Add to List".
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -128,13 +164,14 @@
         loadItems();
         loadCurrency();
         loadEmployee();
+        updateEntryCount();
     });
 
     // ================= LOAD DROPDOWNS =================
 
     function loadGodown() {
         $.get("/Api/GetGodown", function (data) {
-            var html = "<option value=''>--Select--</option>";
+            var html = "<option value=''>-- Select Warehouse --</option>";
             $.each(data, function (i, v) {
                 html += `<option value="${v.godownNo}">${v.godownName}</option>`;
             });
@@ -144,7 +181,7 @@
 
     function loadItems() {
         $.get("/Api/GetItems", function (data) {
-            var html = "<option value=''>--Select--</option>";
+            var html = "<option value=''>-- Select Item --</option>";
             $.each(data, function (i, v) {
                 html += `<option value="${v.subItemCode}">${v.subItemName}</option>`;
             });
@@ -154,7 +191,7 @@
 
     function loadCurrency() {
         $.get("/Api/GetCurrency", function (data) {
-            var html = "<option value=''>--Select--</option>";
+            var html = "<option value=''>-- Select Currency --</option>";
             $.each(data, function (i, v) {
                 html += `<option value="${v.currencyName}" data-rate="${v.conversionRate}">${v.currencyName}</option>`;
             });
@@ -164,7 +201,7 @@
 
     function loadEmployee() {
         $.get("/Api/GetEmployee", function (data) {
-            var html = "<option value=''>--Select--</option>";
+            var html = "<option value=''>-- Select Employee --</option>";
             $.each(data, function (i, v) {
                 html += `<option value="${v.employeeName}">${v.employeeName}</option>`;
             });
@@ -179,45 +216,79 @@
         $("#txtExchange").val(rate);
     });
 
+    // ================= ITEM CHANGE AUTO LOAD =================
+
+    $("#ddlItem").change(function () {
+        var code = $(this).val();
+
+        if (code == "") {
+            $("#txtItemCode").val("");
+            $("#txtUnit").val("");
+            $("#txtStock").val("");
+            return;
+        }
+
+        $.get("/Api/GetItemDetails?code=" + code, function (data) {
+            $("#txtItemCode").val(data.subItemCode);
+            $("#txtUnit").val(data.unit);
+            $("#txtStock").val(data.stock);
+        });
+    });
+
+    // ================= AUTO AMOUNT CALCULATION =================
+
+    $("#txtQty, #txtRate").on('input', function () {
+        var qty = parseFloat($("#txtQty").val()) || 0;
+        var rate = parseFloat($("#txtRate").val()) || 0;
+        $("#txtAmount").val((qty * rate).toFixed(2));
+    });
+
     // ================= ADD BUTTON =================
-        $("#btnAdd").click(function () {
 
-        var stock = parseFloat($("#txtStock").val());
-        var qty = parseFloat($("#txtQty").val());
+    $("#btnAdd").click(function () {
+        var stock = parseFloat($("#txtStock").val()) || 0;
+        var qty = parseFloat($("#txtQty").val()) || 0;
 
+        // Validation
         if ($("#ddlGodown").val() == "") {
-            alert("Please select Warehouse");
+            showAlert("danger", "Please select a warehouse!");
             return;
         }
 
         if ($("#ddlItem").val() == "") {
-            alert("Please select Item");
+            showAlert("danger", "Please select an item!");
             return;
         }
 
         if (qty <= 0 || isNaN(qty)) {
-            alert("Invalid Quantity");
+            showAlert("danger", "Please enter a valid quantity!");
             return;
         }
 
         if (qty > stock) {
-            alert("Quantity cannot be greater than Stock!");
+            showAlert("warning", "Warning: Quantity exceeds available stock!");
+        }
+
+        if (parseFloat($("#txtRate").val()) <= 0) {
+            showAlert("danger", "Please enter a valid rate!");
             return;
         }
 
-        if ($("#txtRate").val() <= 0) {
-            alert("Invalid Rate");
+        if ($("#ddlEmployee").val() == "") {
+            showAlert("danger", "Please select an employee!");
             return;
         }
 
         var obj = {
             GodownNo: $("#ddlGodown").val(),
+            GodownName: $("#ddlGodown option:selected").text(),
             SubItemCode: $("#ddlItem").val(),
+            ItemName: $("#ddlItem option:selected").text(),
             Quantity: qty,
-            Rate: $("#txtRate").val(),
-            AmountIn: $("#txtAmount").val(),
+            Rate: parseFloat($("#txtRate").val()),
+            AmountIn: parseFloat($("#txtAmount").val()),
             Currency: $("#ddlCurrency").val(),
-            ExchangeRate: $("#txtExchange").val(),
+            ExchangeRate: parseFloat($("#txtExchange").val()) || 1,
             EmployeeName: $("#ddlEmployee").val(),
             Comments: $("#txtComments").val()
         };
@@ -225,55 +296,100 @@
         tempList.push(obj);
         loadTable();
         clearForm();
+        showAlert("success", "Entry added successfully!");
     });
-
 
     // ================= LOAD TEMP TABLE =================
 
     function loadTable() {
         var rows = "";
 
-        $.each(tempList, function (i, v) {
-            rows += `<tr>
-                        <td>${v.GodownNo}</td>
-                        <td>${v.SubItemCode}</td>
-                        <td>${v.Quantity}</td>
-                        <td>${v.Rate}</td>
-                        <td>${v.AmountIn}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" onclick="removeRow(${i})">Delete</button>
-                        </td>
-                     </tr>`;
-        });
+        if (tempList.length === 0) {
+            $("#emptyRow").show();
+        } else {
+            $("#emptyRow").hide();
+            $.each(tempList, function (i, v) {
+                rows += `<tr class="fade-in">
+                            <td><strong>${i + 1}</strong></td>
+                            <td>${v.GodownName}</td>
+                            <td><span class="badge bg-secondary">${v.SubItemCode}</span></td>
+                            <td>${v.Quantity}</td>
+                            <td>${v.Rate.toFixed(2)}</td>
+                            <td><strong>${v.AmountIn.toFixed(2)}</strong></td>
+                            <td>${v.EmployeeName}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="removeRow(${i})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                         </tr>`;
+            });
+        }
 
-        $("#tempTable tbody").html(rows);
+        $("#tempTable tbody").html(tempList.length === 0 ? $("#emptyRow") : rows);
+        updateEntryCount();
     }
 
     function removeRow(index) {
         tempList.splice(index, 1);
         loadTable();
+        showAlert("info", "Entry removed from list.");
+    }
+
+    function updateEntryCount() {
+        $("#entryCount").text(tempList.length);
     }
 
     // ================= SAVE BUTTON =================
 
     $("#btnSave").click(function () {
-
         if (tempList.length == 0) {
-            alert("No data to save!");
+            showAlert("warning", "No data to save! Please add entries first.");
             return;
         }
+
+        if (!confirm("Are you sure you want to save all entries? Stock will be automatically deducted.")) {
+            return;
+        }
+
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
 
         $.ajax({
             url: "/StockDamage/Save",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(tempList),
-            success: function () {
-                alert("Stock Damage Saved Successfully!");
+            success: function (response) {
+                showAlert("success", "✓ Stock damage records saved successfully! Inventory has been updated.");
                 tempList = [];
                 loadTable();
+                
+                // Refresh stock if item is selected
+                if ($("#ddlItem").val() != "") {
+                    var code = $("#ddlItem").val();
+                    $.get("/Api/GetItemDetails?code=" + code, function (data) {
+                        $("#txtStock").val(data.stock);
+                    });
+                }
+            },
+            error: function (xhr) {
+                var errorMsg = "Error saving stock damage!";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                showAlert("danger", errorMsg);
+            },
+            complete: function() {
+                $("#btnSave").prop('disabled', false).html('<i class="fas fa-save"></i> Save All');
             }
         });
+    });
+
+    // ================= CLEAR FORM =================
+
+    $("#btnClear").click(function () {
+        clearForm();
+        showAlert("info", "Form cleared.");
     });
 
     function clearForm() {
@@ -282,30 +398,24 @@
         $("#txtAmount").val("");
         $("#txtComments").val("");
     }
-        // ================= ITEM CHANGE AUTO LOAD =================
 
-    $("#ddlItem").change(function () {
-        var code = $(this).val();
+    // ================= ALERT HELPER =================
 
-        if (code == "") return;
-
-        $.get("/Api/GetItemDetails?code=" + code, function (data) {
-            $("#txtItemCode").val(data.subItemCode);
-            $("#txtUnit").val(data.unit);
-            $("#txtStock").val(data.stock);
-        });
-    });
-        // ================= CURRENCY CHANGE =================
-
-    $("#ddlCurrency").change(function () {
-        var rate = $("#ddlCurrency option:selected").data("rate");
-        $("#txtExchange").val(rate);
-    });
-    // ================= Auto Amount Calculation =================
-        $("#txtQty, #txtRate").keyup(function () {
-        var qty = parseFloat($("#txtQty").val()) || 0;
-        var rate = parseFloat($("#txtRate").val()) || 0;
-        $("#txtAmount").val(qty * rate);
-    });
-
+    function showAlert(type, message) {
+        var alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        $(".page-header").after(alertHtml);
+        
+        setTimeout(function() {
+            $(".alert").fadeOut(function() {
+                $(this).remove();
+            });
+        }, 5000);
+    }
 </script>
