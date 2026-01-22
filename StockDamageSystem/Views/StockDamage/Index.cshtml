@@ -180,13 +180,40 @@
     });
 
     // ================= ADD BUTTON =================
+        $("#btnAdd").click(function () {
 
-    $("#btnAdd").click(function () {
+        var stock = parseFloat($("#txtStock").val());
+        var qty = parseFloat($("#txtQty").val());
+
+        if ($("#ddlGodown").val() == "") {
+            alert("Please select Warehouse");
+            return;
+        }
+
+        if ($("#ddlItem").val() == "") {
+            alert("Please select Item");
+            return;
+        }
+
+        if (qty <= 0 || isNaN(qty)) {
+            alert("Invalid Quantity");
+            return;
+        }
+
+        if (qty > stock) {
+            alert("Quantity cannot be greater than Stock!");
+            return;
+        }
+
+        if ($("#txtRate").val() <= 0) {
+            alert("Invalid Rate");
+            return;
+        }
 
         var obj = {
             GodownNo: $("#ddlGodown").val(),
             SubItemCode: $("#ddlItem").val(),
-            Quantity: $("#txtQty").val(),
+            Quantity: qty,
             Rate: $("#txtRate").val(),
             AmountIn: $("#txtAmount").val(),
             Currency: $("#ddlCurrency").val(),
@@ -199,6 +226,7 @@
         loadTable();
         clearForm();
     });
+
 
     // ================= LOAD TEMP TABLE =================
 
@@ -254,5 +282,30 @@
         $("#txtAmount").val("");
         $("#txtComments").val("");
     }
+        // ================= ITEM CHANGE AUTO LOAD =================
+
+    $("#ddlItem").change(function () {
+        var code = $(this).val();
+
+        if (code == "") return;
+
+        $.get("/Api/GetItemDetails?code=" + code, function (data) {
+            $("#txtItemCode").val(data.subItemCode);
+            $("#txtUnit").val(data.unit);
+            $("#txtStock").val(data.stock);
+        });
+    });
+        // ================= CURRENCY CHANGE =================
+
+    $("#ddlCurrency").change(function () {
+        var rate = $("#ddlCurrency option:selected").data("rate");
+        $("#txtExchange").val(rate);
+    });
+    // ================= Auto Amount Calculation =================
+        $("#txtQty, #txtRate").keyup(function () {
+        var qty = parseFloat($("#txtQty").val()) || 0;
+        var rate = parseFloat($("#txtRate").val()) || 0;
+        $("#txtAmount").val(qty * rate);
+    });
 
 </script>
