@@ -66,29 +66,56 @@ public class ApiController : ControllerBase
 
     // ================= ITEM DETAILS =================
     [HttpGet("GetItemDetails")]
-    public IActionResult GetItemDetails(string code)
+    public IActionResult GetItemDetails(string code, string godownNo = null)
     {
         using var con = GetConnection();
         con.Open();
 
-        SqlCommand cmd = new SqlCommand(@"
-            SELECT s.SubItemCode, s.SubItemName, s.Unit, st.StockQty
-            FROM SubItemCode s
-            LEFT JOIN Stock st ON s.SubItemCode = st.SubItemCode
-            WHERE s.SubItemCode = @code", con);
-
-        cmd.Parameters.AddWithValue("@code", code);
-
-        SqlDataReader dr = cmd.ExecuteReader();
-
-        if (dr.Read())
+        // If godownNo is provided, get warehouse-specific stock
+        if (!string.IsNullOrEmpty(godownNo))
         {
-            return Ok(new
+            SqlCommand cmd = new SqlCommand(@"
+                SELECT s.SubItemCode, s.SubItemName, s.Unit, ISNULL(st.StockQty, 0) as StockQty
+                FROM SubItemCode s
+                LEFT JOIN Stock st ON s.SubItemCode = st.SubItemCode AND st.GodownNo = @godownNo
+                WHERE s.SubItemCode = @code", con);
+
+            cmd.Parameters.AddWithValue("@code", code);
+            cmd.Parameters.AddWithValue("@godownNo", godownNo);
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
             {
-                subItemCode = dr["SubItemCode"].ToString(),
-                unit = dr["Unit"].ToString(),
-                stock = dr["StockQty"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["StockQty"])
-            });
+                return Ok(new
+                {
+                    subItemCode = dr["SubItemCode"].ToString(),
+                    unit = dr["Unit"].ToString(),
+                    stock = dr["StockQty"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["StockQty"])
+                });
+            }
+        }
+        else
+        {
+            // If no warehouse selected, return item info with 0 stock
+            SqlCommand cmd = new SqlCommand(@"
+                SELECT SubItemCode, SubItemName, Unit
+                FROM SubItemCode
+                WHERE SubItemCode = @code", con);
+
+            cmd.Parameters.AddWithValue("@code", code);
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
+            {
+                return Ok(new
+                {
+                    subItemCode = dr["SubItemCode"].ToString(),
+                    unit = dr["Unit"].ToString(),
+                    stock = 0
+                });
+            }
         }
 
         return NotFound();

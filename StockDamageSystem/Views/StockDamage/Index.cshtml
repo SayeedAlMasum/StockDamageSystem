@@ -216,10 +216,30 @@
         $("#txtExchange").val(rate);
     });
 
+    // ================= WAREHOUSE CHANGE AUTO LOAD =================
+
+    $("#ddlGodown").change(function () {
+        var code = $("#ddlItem").val();
+        var godownNo = $(this).val();
+        
+        if (code && godownNo) {
+            // Reload stock for selected warehouse
+            $.get("/Api/GetItemDetails", { code: code, godownNo: godownNo }, function (data) {
+                $("#txtItemCode").val(data.subItemCode);
+                $("#txtUnit").val(data.unit);
+                $("#txtStock").val(data.stock);
+            });
+        } else if (!godownNo) {
+            // Clear stock if no warehouse selected
+            $("#txtStock").val("");
+        }
+    });
+
     // ================= ITEM CHANGE AUTO LOAD =================
 
     $("#ddlItem").change(function () {
         var code = $(this).val();
+        var godownNo = $("#ddlGodown").val();
 
         if (code == "") {
             $("#txtItemCode").val("");
@@ -228,7 +248,15 @@
             return;
         }
 
-        $.get("/Api/GetItemDetails?code=" + code, function (data) {
+        if (!godownNo) {
+            showAlert("warning", "Please select a warehouse first!");
+            $("#txtItemCode").val("");
+            $("#txtUnit").val("");
+            $("#txtStock").val("");
+            return;
+        }
+
+        $.get("/Api/GetItemDetails", { code: code, godownNo: godownNo }, function (data) {
             $("#txtItemCode").val(data.subItemCode);
             $("#txtUnit").val(data.unit);
             $("#txtStock").val(data.stock);
@@ -364,10 +392,11 @@
                 tempList = [];
                 loadTable();
                 
-                // Refresh stock if item is selected
-                if ($("#ddlItem").val() != "") {
+                // Refresh stock if item and warehouse are selected
+                if ($("#ddlItem").val() != "" && $("#ddlGodown").val() != "") {
                     var code = $("#ddlItem").val();
-                    $.get("/Api/GetItemDetails?code=" + code, function (data) {
+                    var godownNo = $("#ddlGodown").val();
+                    $.get("/Api/GetItemDetails", { code: code, godownNo: godownNo }, function (data) {
                         $("#txtStock").val(data.stock);
                     });
                 }

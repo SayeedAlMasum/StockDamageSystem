@@ -60,24 +60,26 @@ namespace StockDamageSystem.Controllers
                                     cmd.ExecuteNonQuery();
                                 }
 
-                                // 2. Deduct stock automatically
+                                // 2. Deduct stock from SPECIFIC WAREHOUSE
                                 using (SqlCommand cmdStock = new SqlCommand(@"
                                     UPDATE Stock 
                                     SET StockQty = StockQty - @Quantity 
-                                    WHERE SubItemCode = @SubItemCode", con, transaction))
+                                    WHERE SubItemCode = @SubItemCode AND GodownNo = @GodownNo", con, transaction))
                                 {
                                     cmdStock.Parameters.AddWithValue("@Quantity", item.Quantity);
                                     cmdStock.Parameters.AddWithValue("@SubItemCode", item.SubItemCode);
+                                    cmdStock.Parameters.AddWithValue("@GodownNo", item.GodownNo);
                                     
                                     int rowsAffected = cmdStock.ExecuteNonQuery();
                                     
-                                    // If no stock record exists, create one with negative quantity
+                                    // If no stock record exists for this warehouse+item, create one with negative quantity
                                     if (rowsAffected == 0)
                                     {
                                         using (SqlCommand cmdInsert = new SqlCommand(@"
-                                            INSERT INTO Stock (SubItemCode, StockQty) 
-                                            VALUES (@SubItemCode, -@Quantity)", con, transaction))
+                                            INSERT INTO Stock (GodownNo, SubItemCode, StockQty) 
+                                            VALUES (@GodownNo, @SubItemCode, -@Quantity)", con, transaction))
                                         {
+                                            cmdInsert.Parameters.AddWithValue("@GodownNo", item.GodownNo);
                                             cmdInsert.Parameters.AddWithValue("@SubItemCode", item.SubItemCode);
                                             cmdInsert.Parameters.AddWithValue("@Quantity", item.Quantity);
                                             cmdInsert.ExecuteNonQuery();
@@ -88,7 +90,7 @@ namespace StockDamageSystem.Controllers
                             
                             // Commit transaction if all operations succeed
                             transaction.Commit();
-                            return Ok(new { success = true, message = "Stock damage records saved and stock deducted successfully" });
+                            return Ok(new { success = true, message = "Stock damage records saved and warehouse-specific stock deducted successfully" });
                         }
                         catch (Exception)
                         {
