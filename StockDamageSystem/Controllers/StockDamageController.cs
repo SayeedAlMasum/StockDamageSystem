@@ -35,14 +35,12 @@ namespace StockDamageSystem.Controllers
                 {
                     con.Open();
                     
-                    // Start a transaction to ensure data consistency
                     using (SqlTransaction transaction = con.BeginTransaction())
                     {
                         try
                         {
                             foreach (var item in stockDamages)
                             {
-                                // 1. Save stock damage record
                                 using (SqlCommand cmd = new SqlCommand("SP_StockDamage_Save", con, transaction))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
@@ -60,7 +58,6 @@ namespace StockDamageSystem.Controllers
                                     cmd.ExecuteNonQuery();
                                 }
 
-                                // 2. Deduct stock from SPECIFIC WAREHOUSE
                                 using (SqlCommand cmdStock = new SqlCommand(@"
                                     UPDATE Stock 
                                     SET StockQty = StockQty - @Quantity 
@@ -72,7 +69,6 @@ namespace StockDamageSystem.Controllers
                                     
                                     int rowsAffected = cmdStock.ExecuteNonQuery();
                                     
-                                    // If no stock record exists for this warehouse+item, create one with negative quantity
                                     if (rowsAffected == 0)
                                     {
                                         using (SqlCommand cmdInsert = new SqlCommand(@"
@@ -88,13 +84,11 @@ namespace StockDamageSystem.Controllers
                                 }
                             }
                             
-                            // Commit transaction if all operations succeed
                             transaction.Commit();
                             return Ok(new { success = true, message = "Stock damage records saved and warehouse-specific stock deducted successfully" });
                         }
                         catch (Exception)
                         {
-                            // Rollback transaction if any error occurs
                             transaction.Rollback();
                             throw;
                         }

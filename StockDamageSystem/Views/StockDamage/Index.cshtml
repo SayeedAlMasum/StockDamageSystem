@@ -8,13 +8,11 @@
 
 <div class="container mt-4 fade-in">
 
-    <!-- Page Header -->
     <div class="page-header">
         <h1>Stock Damage Management</h1>
         <p>Record and track damaged stock items with automated inventory updates</p>
     </div>
 
-    <!-- ================= ENTRY FORM ================= -->
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-edit"></i> Damage Entry Form
@@ -121,7 +119,6 @@
         </div>
     </div>
 
-    <!-- ================= TEMPORARY ENTRY LIST ================= -->
     <div class="card">
         <div class="card-header">
             <i class="fas fa-list"></i> Pending Entries <span class="badge bg-light text-dark ms-2" id="entryCount">0</span>
@@ -167,8 +164,6 @@
         updateEntryCount();
     });
 
-    // ================= LOAD DROPDOWNS =================
-
     function loadGodown() {
         $.get("/Api/GetGodown", function (data) {
             var html = "<option value=''>-- Select Warehouse --</option>";
@@ -209,33 +204,25 @@
         });
     }
 
-    // ================= AUTO EXCHANGE RATE =================
-
     $("#ddlCurrency").change(function () {
         var rate = $("#ddlCurrency option:selected").data("rate");
         $("#txtExchange").val(rate);
     });
-
-    // ================= WAREHOUSE CHANGE AUTO LOAD =================
 
     $("#ddlGodown").change(function () {
         var code = $("#ddlItem").val();
         var godownNo = $(this).val();
         
         if (code && godownNo) {
-            // Reload stock for selected warehouse
             $.get("/Api/GetItemDetails", { code: code, godownNo: godownNo }, function (data) {
                 $("#txtItemCode").val(data.subItemCode);
                 $("#txtUnit").val(data.unit);
                 $("#txtStock").val(data.stock);
             });
         } else if (!godownNo) {
-            // Clear stock if no warehouse selected
             $("#txtStock").val("");
         }
     });
-
-    // ================= ITEM CHANGE AUTO LOAD =================
 
     $("#ddlItem").change(function () {
         var code = $(this).val();
@@ -263,21 +250,16 @@
         });
     });
 
-    // ================= AUTO AMOUNT CALCULATION =================
-
     $("#txtQty, #txtRate").on('input', function () {
         var qty = parseFloat($("#txtQty").val()) || 0;
         var rate = parseFloat($("#txtRate").val()) || 0;
         $("#txtAmount").val((qty * rate).toFixed(2));
     });
 
-    // ================= ADD BUTTON =================
-
     $("#btnAdd").click(function () {
         var stock = parseFloat($("#txtStock").val()) || 0;
         var qty = parseFloat($("#txtQty").val()) || 0;
 
-        // Validation
         if ($("#ddlGodown").val() == "") {
             showAlert("danger", "Please select a warehouse!");
             return;
@@ -327,8 +309,6 @@
         showAlert("success", "Entry added successfully!");
     });
 
-    // ================= LOAD TEMP TABLE =================
-
     function loadTable() {
         var rows = "";
 
@@ -368,8 +348,6 @@
         $("#entryCount").text(tempList.length);
     }
 
-    // ================= SAVE BUTTON =================
-
     $("#btnSave").click(function () {
         if (tempList.length == 0) {
             showAlert("warning", "No data to save! Please add entries first.");
@@ -392,7 +370,6 @@
                 tempList = [];
                 loadTable();
                 
-                // Refresh stock if item and warehouse are selected
                 if ($("#ddlItem").val() != "" && $("#ddlGodown").val() != "") {
                     var code = $("#ddlItem").val();
                     var godownNo = $("#ddlGodown").val();
@@ -414,8 +391,6 @@
         });
     });
 
-    // ================= CLEAR FORM =================
-
     $("#btnClear").click(function () {
         clearForm();
         showAlert("info", "Form cleared.");
@@ -427,8 +402,6 @@
         $("#txtAmount").val("");
         $("#txtComments").val("");
     }
-
-    // ================= ALERT HELPER =================
 
     function showAlert(type, message) {
         var alertHtml = `

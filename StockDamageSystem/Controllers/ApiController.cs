@@ -18,7 +18,6 @@ public class ApiController : ControllerBase
         return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
     }
 
-    // ================= GODOWN =================
     [HttpGet("GetGodown")]
     public IActionResult GetGodown()
     {
@@ -41,7 +40,6 @@ public class ApiController : ControllerBase
         return Ok(list);
     }
 
-    // ================= ITEMS =================
     [HttpGet("GetItems")]
     public IActionResult GetItems()
     {
@@ -64,14 +62,12 @@ public class ApiController : ControllerBase
         return Ok(list);
     }
 
-    // ================= ITEM DETAILS =================
     [HttpGet("GetItemDetails")]
     public IActionResult GetItemDetails(string code, string godownNo = null)
     {
         using var con = GetConnection();
         con.Open();
 
-        // If godownNo is provided, get warehouse-specific stock
         if (!string.IsNullOrEmpty(godownNo))
         {
             SqlCommand cmd = new SqlCommand(@"
@@ -97,7 +93,6 @@ public class ApiController : ControllerBase
         }
         else
         {
-            // If no warehouse selected, return item info with 0 stock
             SqlCommand cmd = new SqlCommand(@"
                 SELECT SubItemCode, SubItemName, Unit
                 FROM SubItemCode
@@ -121,7 +116,6 @@ public class ApiController : ControllerBase
         return NotFound();
     }
 
-    // ================= CURRENCY =================
     [HttpGet("GetCurrency")]
     public IActionResult GetCurrency()
     {
@@ -144,7 +138,6 @@ public class ApiController : ControllerBase
         return Ok(list);
     }
 
-    // ================= EMPLOYEE =================
     [HttpGet("GetEmployee")]
     public IActionResult GetEmployee()
     {
